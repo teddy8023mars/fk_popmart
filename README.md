@@ -15,34 +15,83 @@
 
 ## 🚀 快速开始
 
-### 1. 环境要求
+### 1. 创建Discord机器人
+
+#### 步骤1：创建Discord应用程序
+1. 访问 [Discord Developer Portal](https://discord.com/developers/applications)
+2. 点击 **"New Application"** 创建新应用
+3. 输入应用名称（如：`PopMart Monitor`）
+4. 点击 **"Create"** 创建应用
+
+#### 步骤2：创建机器人
+1. 在左侧导航栏点击 **"Bot"**
+2. 点击 **"Add Bot"** 按钮
+3. 确认创建机器人
+
+#### 步骤3：获取BOT_TOKEN
+1. 在Bot页面找到 **"Token"** 部分  
+2. 点击 **"Reset Token"** 按钮
+3. **复制并保存Token**（这就是你的`BOT_TOKEN`）
+4. ⚠️ **重要**：Token只显示一次，请妥善保存！
+
+#### 步骤4：设置机器人权限
+在Bot页面确保启用以下权限：
+- ✅ **Send Messages** - 发送消息
+- ✅ **Use Slash Commands** - 使用斜杠命令  
+- ✅ **Embed Links** - 嵌入链接
+- ✅ **Attach Files** - 附加文件
+- ✅ **Use External Emojis** - 使用外部表情
+- ✅ **Mention Everyone** - @everyone和@here通知
+
+#### 步骤5：邀请机器人到服务器
+1. 在左侧导航栏点击 **"OAuth2"** → **"URL Generator"**
+2. 在 **"Scopes"** 部分选择：
+   - ✅ `bot`
+   - ✅ `applications.commands`
+3. 在 **"Bot Permissions"** 部分选择：
+   - ✅ Send Messages
+   - ✅ Use Slash Commands
+   - ✅ Embed Links
+   - ✅ Attach Files
+   - ✅ Use External Emojis
+   - ✅ Mention Everyone
+4. 复制生成的URL并在浏览器中打开
+5. 选择你的服务器并点击 **"Authorize"**
+
+#### 步骤6：获取频道ID
+1. 在Discord中，进入 **用户设置** → **高级** → 启用 **"开发者模式"**
+2. 右键点击你要监控的频道
+3. 点击 **"复制频道ID"**
+4. 这个ID就是你的 `CHANNEL_ID`
+
+### 2. 环境要求
 
 - Python 3.8+
-- Chrome浏览器（用于Selenium）
-- Discord Bot Token
+- Chrome浏览器（用于Selenium）  
+- Discord服务器管理员权限（用于添加机器人）
 - 稳定的网络连接
 
-### 2. 安装依赖
+### 3. 安装依赖
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. 配置环境变量
+### 4. 配置环境变量
 
 创建 `.env` 文件并配置以下变量：
 
 ```env
 # Discord Bot Configuration
-BOT_TOKEN=你的机器人token
+BOT_TOKEN=MTIzNDU2Nzg5MDEyMzQ1Njc4OS5GaWN0aW9uYWwuVG9rZW5Gb3JFeGFtcGxl
 
 # Channel IDs for different platforms
-ALIEXPRESS_CHANNEL_ID=AliExpress频道ID
-OFFICIAL_CHANNEL_ID=官网频道ID
+ALIEXPRESS_CHANNEL_ID=1234567890123456789
+OFFICIAL_CHANNEL_ID=9876543210987654321
 
 # Product URLs to monitor
-ALIEXPRESS_PRODUCT_URL=AliExpress商品URL
-OFFICIAL_PRODUCT_URL=PopMart官网商品URL
+ALIEXPRESS_PRODUCT_URL=https://www.aliexpress.com/item/1005007198494636.html
+OFFICIAL_PRODUCT_URL=https://www.popmart.com/your-product-url
 
 # Monitoring intervals (seconds)
 ALIEXPRESS_MIN_INTERVAL=3
@@ -59,7 +108,13 @@ ALIEXPRESS_NOTIFICATION_INTERVAL=3
 OFFICIAL_NOTIFICATION_INTERVAL=2
 ```
 
-### 4. 运行监控器
+> 💡 **配置提示**：
+> - `BOT_TOKEN`：从Discord Developer Portal获取的机器人Token
+> - `CHANNEL_ID`：右键Discord频道获取的数字ID
+> - `PRODUCT_URL`：要监控的商品完整URL地址
+> - 确保机器人已邀请到服务器并有正确权限
+
+### 5. 运行监控器
 
 ```bash
 # 仅监控AliExpress
@@ -160,25 +215,48 @@ FK_Popmart/
    ```
    **解决**：创建 `.env` 文件并配置正确的BOT_TOKEN
 
-2. **Discord权限问题**
+2. **Discord机器人Token无效**
+   ```bash
+   ❌ Discord登录失败，请检查BOT_TOKEN是否正确
+   ```
+   **解决**：
+   - 检查Token是否复制正确（无额外空格）
+   - 确认Token没有过期或被重置
+   - 在Discord Developer Portal重新生成Token
+
+3. **Discord权限问题**
    ```bash
    ❌ 找不到Discord频道: XXXXXX
    ```
-   **解决**：检查频道ID是否正确，确保机器人有访问权限
+   **解决**：
+   - 检查频道ID是否正确（纯数字，无其他字符）
+   - 确保机器人已被邀请到服务器
+   - 确认机器人有查看频道和发送消息的权限
+   - 检查频道是否为私有频道（机器人需要特殊权限）
 
-3. **页面加载问题**
+4. **机器人无法发送消息**
+   ```bash
+   ❌ 403 Forbidden: Missing Permissions  
+   ```
+   **解决**：
+   - 确保机器人有"发送消息"权限
+   - 确保机器人有"嵌入链接"权限
+   - 确保机器人有"使用外部表情符号"权限
+   - 检查频道权限设置，确保机器人角色有必要权限
+
+5. **页面加载问题**
    ```bash
    ⏰ 页面加载超时
    ```
    **解决**：检查网络连接，可能需要重启程序或更换网络
 
-4. **价格获取失败**
+6. **价格获取失败**
    ```bash
    💰 价格暂不可用
    ```
    **解决**：可能是页面结构变化或地区限制，检查产品URL是否有效
 
-5. **图片显示问题**
+7. **图片显示问题**
    ```bash
    📸 没有找到有效的图片URL
    ```
@@ -201,6 +279,7 @@ FK_Popmart/
 - 💰 **价格增强**：新增用户指定的价格选择器支持
 - 🚀 **性能提升**：移除冗余代码，提升运行效率
 - 🎯 **参数优化**：将PopMart参数从容易误解的`--off`改为更清晰的`--pop`
+- 📖 **文档完善**：新增详细的Discord机器人设置指南和故障排除
 
 ### v2.0 (2025-01-02)
 - 🎯 多平台监控支持
