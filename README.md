@@ -79,7 +79,13 @@ pip install -r requirements.txt
 
 ### 4. 配置环境变量
 
-创建 `.env` 文件并配置以下变量：
+创建 `.env` 文件并配置以下变量（可以复制 `.env.example` 文件作为模板）：
+
+```bash
+# 复制模板文件
+cp .env.example .env
+# 然后编辑 .env 文件，填入你的真实配置
+```
 
 ```env
 # Discord Bot Configuration
