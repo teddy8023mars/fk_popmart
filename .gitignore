@@ -1,0 +1,9 @@
+# Environment variables
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# WebDriver Manager logs
+wdm.log
