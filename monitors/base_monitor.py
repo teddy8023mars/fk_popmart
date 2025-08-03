@@ -13,7 +13,7 @@ class BaseMonitor(ABC):
     """基础监控类，定义所有监控器的通用接口和功能"""
 
     def __init__(self, platform_name, channel_id, product_url, min_interval, max_interval,
-                 heartbeat_interval, notification_interval, page_load_timeout=25, 
+                 heartbeat_interval, notification_interval, page_load_timeout=25,
                  page_load_wait=3, js_render_wait=5, cloudflare_wait=10, verbose_mode=False):
         self.platform_name = platform_name
         self.channel_id = channel_id

@@ -54,22 +54,22 @@ class MultiPlatformMonitor:
             # 检查间隔（秒）
             'min_interval': int(os.getenv('MONITOR_MIN_INTERVAL', 3)),
             'max_interval': int(os.getenv('MONITOR_MAX_INTERVAL', 6)),
-            
+
             # 通知间隔（秒）
             'notification_interval': int(os.getenv('MONITOR_NOTIFICATION_INTERVAL', 3)),
-            
+
             # 心跳间隔（秒）- 目前未使用，但保留配置
             'heartbeat_interval': int(os.getenv('MONITOR_HEARTBEAT_INTERVAL', 300)),
-            
+
             # 页面加载超时（秒）
             'page_load_timeout': int(os.getenv('MONITOR_PAGE_LOAD_TIMEOUT', 25)),
-            
+
             # 页面加载后等待时间（秒）
             'page_load_wait': int(os.getenv('MONITOR_PAGE_LOAD_WAIT', 3)),
-            
+
             # JavaScript渲染等待时间（秒）
             'js_render_wait': int(os.getenv('MONITOR_JS_RENDER_WAIT', 5)),
-            
+
             # Cloudflare验证等待时间（秒）
             'cloudflare_wait': int(os.getenv('MONITOR_CLOUDFLARE_WAIT', 10)),
         }
