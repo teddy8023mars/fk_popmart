@@ -312,6 +312,9 @@ class OfficialMonitor(BaseMonitor):
             price_short = product_price.replace("价格获取失败", "价格失败")
             print(f" | 💰{price_short}")
 
+            # 更新当前库存状态
+            self.current_stock_status = stock_available
+
             # 判断是否需要通知
             should_notify, notification_title = self.should_notify()
 

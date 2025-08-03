@@ -151,8 +151,6 @@ class BaseMonitor(ABC):
                 return True, "📉 Stock Sold Out 📉"
             elif self.verbose_mode:
                 return True, f"📊 {self.platform_name} Stock Check"
-            elif current_time - self.last_heartbeat_time > self.heartbeat_interval:
-                self.last_heartbeat_time = current_time
-                return True, f"💓 {self.platform_name} Monitor Heartbeat"
+            # 移除心跳通知，只在状态变化时通知
 
         return False, ""
