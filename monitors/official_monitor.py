@@ -12,7 +12,8 @@ class OfficialMonitor(BaseMonitor):
     """PopMart官网库存监控器"""
 
     def __init__(self, channel_id, product_url, min_interval, max_interval,
-                 heartbeat_interval, notification_interval, verbose_mode=False):
+                 heartbeat_interval, notification_interval, page_load_timeout=25,
+                 page_load_wait=3, js_render_wait=5, cloudflare_wait=10, verbose_mode=False):
         super().__init__(
             platform_name="PopMart Official",
             channel_id=channel_id,
@@ -21,6 +22,10 @@ class OfficialMonitor(BaseMonitor):
             max_interval=max_interval,
             heartbeat_interval=heartbeat_interval,
             notification_interval=notification_interval,
+            page_load_timeout=page_load_timeout,
+            page_load_wait=page_load_wait,
+            js_render_wait=js_render_wait,
+            cloudflare_wait=cloudflare_wait,
             verbose_mode=verbose_mode
         )
         self.current_stock_status = False
@@ -105,10 +110,10 @@ class OfficialMonitor(BaseMonitor):
             # 访问PopMart产品页面
             print("🌐 正在访问PopMart产品页面...", end="", flush=True)
             self.driver.get(self.product_url)
-            await asyncio.sleep(2)
+            await asyncio.sleep(self.page_load_wait)
 
             # 等待页面准备就绪
-            WebDriverWait(self.driver, 20).until(
+            WebDriverWait(self.driver, self.page_load_timeout).until(
                 lambda d: d.execute_script(
                     "return document.readyState") == "complete"
             )
@@ -118,7 +123,7 @@ class OfficialMonitor(BaseMonitor):
             if "Just a moment" in title or "Access denied" in title:
                 print(" ⛔ Cloudflare验证，刷新中...", end="", flush=True)
                 self.driver.refresh()
-                await asyncio.sleep(10)
+                await asyncio.sleep(self.cloudflare_wait)
 
             # 验证页面内容
             page_source = self.driver.page_source

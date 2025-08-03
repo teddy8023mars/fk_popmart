@@ -48,25 +48,50 @@ class MultiPlatformMonitor:
             datefmt='%H:%M:%S'
         )
 
+    def get_unified_config(self):
+        """获取统一的配置参数"""
+        return {
+            # 检查间隔（秒）
+            'min_interval': int(os.getenv('MONITOR_MIN_INTERVAL', 3)),
+            'max_interval': int(os.getenv('MONITOR_MAX_INTERVAL', 6)),
+            
+            # 通知间隔（秒）
+            'notification_interval': int(os.getenv('MONITOR_NOTIFICATION_INTERVAL', 3)),
+            
+            # 心跳间隔（秒）- 目前未使用，但保留配置
+            'heartbeat_interval': int(os.getenv('MONITOR_HEARTBEAT_INTERVAL', 300)),
+            
+            # 页面加载超时（秒）
+            'page_load_timeout': int(os.getenv('MONITOR_PAGE_LOAD_TIMEOUT', 25)),
+            
+            # 页面加载后等待时间（秒）
+            'page_load_wait': int(os.getenv('MONITOR_PAGE_LOAD_WAIT', 3)),
+            
+            # JavaScript渲染等待时间（秒）
+            'js_render_wait': int(os.getenv('MONITOR_JS_RENDER_WAIT', 5)),
+            
+            # Cloudflare验证等待时间（秒）
+            'cloudflare_wait': int(os.getenv('MONITOR_CLOUDFLARE_WAIT', 10)),
+        }
+
     def add_aliexpress_monitor(self):
         """添加AliExpress监控器"""
         try:
             channel_id = int(os.getenv('ALIEXPRESS_CHANNEL_ID'))
             product_url = os.getenv('ALIEXPRESS_PRODUCT_URL')
-            min_interval = int(os.getenv('ALIEXPRESS_MIN_INTERVAL', 3))
-            max_interval = int(os.getenv('ALIEXPRESS_MAX_INTERVAL', 8))
-            heartbeat_interval = int(
-                os.getenv('ALIEXPRESS_HEARTBEAT_INTERVAL', 180))
-            notification_interval = int(
-                os.getenv('ALIEXPRESS_NOTIFICATION_INTERVAL', 3))
+            config = self.get_unified_config()
 
             monitor = AliExpressMonitor(
                 channel_id=channel_id,
                 product_url=product_url,
-                min_interval=min_interval,
-                max_interval=max_interval,
-                heartbeat_interval=heartbeat_interval,
-                notification_interval=notification_interval,
+                min_interval=config['min_interval'],
+                max_interval=config['max_interval'],
+                heartbeat_interval=config['heartbeat_interval'],
+                notification_interval=config['notification_interval'],
+                page_load_timeout=config['page_load_timeout'],
+                page_load_wait=config['page_load_wait'],
+                js_render_wait=config['js_render_wait'],
+                cloudflare_wait=config['cloudflare_wait'],
                 verbose_mode=self.verbose_mode
             )
 
@@ -81,20 +106,19 @@ class MultiPlatformMonitor:
         try:
             channel_id = int(os.getenv('OFFICIAL_CHANNEL_ID'))
             product_url = os.getenv('OFFICIAL_PRODUCT_URL')
-            min_interval = int(os.getenv('OFFICIAL_MIN_INTERVAL', 2))
-            max_interval = int(os.getenv('OFFICIAL_MAX_INTERVAL', 5))
-            heartbeat_interval = int(
-                os.getenv('OFFICIAL_HEARTBEAT_INTERVAL', 120))
-            notification_interval = int(
-                os.getenv('OFFICIAL_NOTIFICATION_INTERVAL', 2))
+            config = self.get_unified_config()
 
             monitor = OfficialMonitor(
                 channel_id=channel_id,
                 product_url=product_url,
-                min_interval=min_interval,
-                max_interval=max_interval,
-                heartbeat_interval=heartbeat_interval,
-                notification_interval=notification_interval,
+                min_interval=config['min_interval'],
+                max_interval=config['max_interval'],
+                heartbeat_interval=config['heartbeat_interval'],
+                notification_interval=config['notification_interval'],
+                page_load_timeout=config['page_load_timeout'],
+                page_load_wait=config['page_load_wait'],
+                js_render_wait=config['js_render_wait'],
+                cloudflare_wait=config['cloudflare_wait'],
                 verbose_mode=self.verbose_mode
             )
 

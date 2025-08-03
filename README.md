@@ -5,10 +5,11 @@
 ## 🎯 功能特性
 
 - ✅ **多平台同时监控** - 支持AliExpress和PopMart官网并发监控
+- ✅ **统一配置系统** - 所有平台使用相同的时间参数配置
 - ✅ **模块化设计** - 每个平台独立的监控模块，易于扩展
 - ✅ **环境变量配置** - 敏感信息安全存储在.env文件中
 - ✅ **灵活的命令行参数** - 可选择监控单个或多个平台
-- ✅ **智能通知策略** - 库存变化时立即通知，无库存时定期心跳
+- ✅ **智能通知策略** - 库存变化时立即通知，无库存时静默监控
 - ✅ **高质量图片显示** - 自动获取产品的高清图片（支持.avif格式）
 - ✅ **增强反爬虫机制** - 内置多种反检测措施
 - ✅ **智能价格获取** - 多层级价格检测策略，支持多种货币
@@ -99,25 +100,38 @@ OFFICIAL_CHANNEL_ID=9876543210987654321
 ALIEXPRESS_PRODUCT_URL=https://www.aliexpress.com/item/1005007198494636.html
 OFFICIAL_PRODUCT_URL=https://www.popmart.com/your-product-url
 
-# Monitoring intervals (seconds)
-ALIEXPRESS_MIN_INTERVAL=3
-ALIEXPRESS_MAX_INTERVAL=8
-OFFICIAL_MIN_INTERVAL=2
-OFFICIAL_MAX_INTERVAL=5
+# ========================================
+# 统一的时间配置参数
+# ========================================
 
-# Heartbeat intervals (seconds)
-ALIEXPRESS_HEARTBEAT_INTERVAL=180
-OFFICIAL_HEARTBEAT_INTERVAL=120
+# 检查间隔（秒）- 每次检查之间的随机等待时间
+MONITOR_MIN_INTERVAL=3
+MONITOR_MAX_INTERVAL=6
 
-# Notification intervals (seconds)
-ALIEXPRESS_NOTIFICATION_INTERVAL=3
-OFFICIAL_NOTIFICATION_INTERVAL=2
+# 通知间隔（秒）- 有库存时连续通知的间隔
+MONITOR_NOTIFICATION_INTERVAL=3
+
+# 心跳间隔（秒）- 目前未使用，保留配置
+MONITOR_HEARTBEAT_INTERVAL=300
+
+# 页面加载超时（秒）- 等待页面完全加载的最大时间
+MONITOR_PAGE_LOAD_TIMEOUT=25
+
+# 页面加载后等待时间（秒）- 页面加载完成后的额外等待
+MONITOR_PAGE_LOAD_WAIT=3
+
+# JavaScript渲染等待时间（秒）- 等待JavaScript内容渲染
+MONITOR_JS_RENDER_WAIT=5
+
+# Cloudflare验证等待时间（秒）- 遇到验证时的等待时间
+MONITOR_CLOUDFLARE_WAIT=10
 ```
 
 > 💡 **配置提示**：
 > - `BOT_TOKEN`：从Discord Developer Portal获取的机器人Token
 > - `CHANNEL_ID`：右键Discord频道获取的数字ID
 > - `PRODUCT_URL`：要监控的商品完整URL地址
+> - 所有平台现在使用统一的时间配置参数
 > - 确保机器人已邀请到服务器并有正确权限
 
 ### 5. 运行监控器

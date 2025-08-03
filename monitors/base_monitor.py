@@ -13,7 +13,8 @@ class BaseMonitor(ABC):
     """基础监控类，定义所有监控器的通用接口和功能"""
 
     def __init__(self, platform_name, channel_id, product_url, min_interval, max_interval,
-                 heartbeat_interval, notification_interval, verbose_mode=False):
+                 heartbeat_interval, notification_interval, page_load_timeout=25, 
+                 page_load_wait=3, js_render_wait=5, cloudflare_wait=10, verbose_mode=False):
         self.platform_name = platform_name
         self.channel_id = channel_id
         self.product_url = product_url
@@ -21,6 +22,10 @@ class BaseMonitor(ABC):
         self.max_interval = max_interval
         self.heartbeat_interval = heartbeat_interval
         self.notification_interval = notification_interval
+        self.page_load_timeout = page_load_timeout
+        self.page_load_wait = page_load_wait
+        self.js_render_wait = js_render_wait
+        self.cloudflare_wait = cloudflare_wait
         self.verbose_mode = verbose_mode
 
         # 状态跟踪
