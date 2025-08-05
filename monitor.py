@@ -28,6 +28,9 @@ class PopMartMonitor:
 
         # 设置Discord客户端
         intents = discord.Intents.default()
+        intents.message_content = True  # 需要消息内容权限
+        intents.guilds = True  # 需要服务器权限
+        intents.guild_messages = True  # 需要服务器消息权限
         self.client = discord.Client(intents=intents)
 
         # 配置日志
@@ -104,16 +107,43 @@ class PopMartMonitor:
         """发送启动通知"""
         mode_text = "Verbose模式" if self.verbose_mode else "正常模式"
 
+        print(
+            f"🔍 Discord客户端状态: {'已连接' if not self.client.is_closed() else '未连接'}")
+        print(f"🔍 当前用户: {self.client.user}")
+        print(f"🔍 服务器数量: {len(self.client.guilds)}")
+
         for monitor in self.monitors:
             try:
+                print(f"🔍 尝试获取频道ID: {monitor.channel_id}")
                 channel = self.client.get_channel(monitor.channel_id)
                 if channel:
+                    print(
+                        f"✅ 找到频道: {channel.name} (服务器: {channel.guild.name})")
+
+                    # 检查机器人权限
+                    permissions = channel.permissions_for(channel.guild.me)
+                    print(
+                        f"🔍 机器人权限: 发送消息={permissions.send_messages}, 嵌入链接={permissions.embed_links}")
+
+                    if not permissions.send_messages:
+                        print(f"❌ 机器人在频道 {channel.name} 中没有发送消息权限")
+                        continue
+
                     product_name = monitor.extract_product_name_from_url(
                         monitor.product_url)
                     await channel.send(f"🤖 {monitor.platform_name}监控启动 | {product_name} | {mode_text}")
                     print(f"✅ {monitor.platform_name}启动通知已发送")
+                else:
+                    print(f"❌ 找不到频道ID: {monitor.channel_id}")
+                    print(f"🔍 可用频道列表:")
+                    for guild in self.client.guilds:
+                        for ch in guild.text_channels:
+                            print(
+                                f"   - {ch.name} (ID: {ch.id}) 在服务器 {guild.name}")
             except Exception as e:
                 print(f"❌ {monitor.platform_name}启动通知发送失败: {e}")
+                import traceback
+                traceback.print_exc()
 
     async def run_monitors(self):
         """运行所有监控器"""
