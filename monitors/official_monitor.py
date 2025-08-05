@@ -303,7 +303,7 @@ class OfficialMonitor(BaseMonitor):
                         button_text = "BUY NOW"
                     else:
                         stock_available = False
-                        button_text = "未知状态"
+                        button_text = "N/A"
 
             except Exception as e:
                 print(f" ❌ 库存检查出错: {e}", end="")
@@ -370,26 +370,39 @@ class OfficialMonitor(BaseMonitor):
                     inline=True
                 )
 
+                # 添加空字段来换行
+                embed.add_field(name="\u200b", value="\u200b", inline=False)
+
                 # 创建快速结算URL
                 quick_checkout_url = None
                 if product_spu_id and product_sku_id:
                     quick_checkout_url = self.create_quick_checkout_url(
                         product_spu_id, product_sku_id, product_title)
 
-                # 构建链接文本
-                links_text = f"[Product Link]({self.product_url})"
-                if quick_checkout_url:
-                    links_text += f"\n[Checkout Page]({quick_checkout_url})"
-
+                # 添加商品页链接
                 embed.add_field(
-                    name="🛒 Quick Links",
-                    value=links_text,
-                    inline=False
+                    name="🛍️ Product Link",
+                    value=f"[View Product]({self.product_url})",
+                    inline=True
                 )
+
+                # 添加结算页链接（如果可用）
+                if quick_checkout_url:
+                    embed.add_field(
+                        name="🚀 ATC Link",
+                        value=f"[Checkout]({quick_checkout_url})",
+                        inline=True
+                    )
+                else:
+                    embed.add_field(
+                        name="🚀 ATC Link",
+                        value="Not Available",
+                        inline=True
+                    )
 
                 embed.add_field(
                     name="🔔 Alert",
-                    value="**Go Go Go!** Limited stock available.",
+                    value="**Limited stock available.",
                     inline=False
                 )
 
