@@ -345,77 +345,77 @@ class OfficialMonitor(BaseMonitor):
             # 发送Discord通知
             channel = client.get_channel(self.channel_id)
             if channel:
-                # 创建Discord embed
+                # ------------------- Final Discord Embed Layout -------------------
+
+                # 1. 根据库存状态设置颜色
+                embed_color = 0x28a745 if stock_available else 0xdc3545  # 绿色:有货, 红色:缺货
+
+                # 2. 创建Embed对象 (标题不加链接)
                 embed = discord.Embed(
-                    title=notification_title,
+                    title=f"PopMart Official Stock Check",
                     description=f"**Store:** popmart.com/SG",
-                    color=0xff6b6b  # 红色
+                    color=embed_color
                 )
 
+                # 3. 产品信息
                 embed.add_field(
                     name="📦 In-Stock Item",
                     value=product_title,
                     inline=False
                 )
 
+                # 4. 价格
                 embed.add_field(
                     name="💰 Price",
                     value=product_price,
                     inline=True
                 )
 
+                # 5. 状态
                 embed.add_field(
                     name="📊 Status",
                     value=button_text,
                     inline=True
                 )
 
-                # 添加空字段来换行
-                embed.add_field(name="\u200b", value="\u200b", inline=False)
+                # 6. 空占位符，用于对齐
+                embed.add_field(name="\u200b", value="\u200b", inline=True)
 
-                # 创建快速结算URL
-                quick_checkout_url = None
-                if product_spu_id and product_sku_id:
-                    quick_checkout_url = self.create_quick_checkout_url(
-                        product_spu_id, product_sku_id, product_title)
-
-                # 添加商品页链接
+                # 7. 产品链接
                 embed.add_field(
                     name="🛍️ Product Link",
                     value=f"[View Product]({self.product_url})",
                     inline=True
                 )
 
-                # 添加结算页链接（如果可用）
-                if quick_checkout_url:
-                    embed.add_field(
-                        name="🚀 ATC Link",
-                        value=f"[Checkout]({quick_checkout_url})",
-                        inline=True
-                    )
-                else:
-                    embed.add_field(
-                        name="🚀 ATC Link",
-                        value="Not Available",
-                        inline=True
-                    )
+                # 8. ATC链接
+                quick_checkout_url = self.create_quick_checkout_url(
+                    product_spu_id, product_sku_id, product_title
+                )
+                embed.add_field(
+                    name="🚀 ATC Link",
+                    value=f"[Checkout]({quick_checkout_url})" if quick_checkout_url else "N/A",
+                    inline=True
+                )
 
+                # 9. 提醒
                 embed.add_field(
                     name="🔔 Alert",
-                    value="**Limited stock available.",
+                    value="**Go Go Go!** Limited stock available.",
                     inline=False
                 )
 
-                # 添加产品图片
+                # 10. 设置页脚
+                embed.set_footer(
+                    text=f"PopMart Monitor by FK_popmart | {time.strftime('%Y-%m-%d %H:%M:%S')}"
+                )
+
+                # 11. 设置缩略图
                 if product_image_url:
                     embed.set_thumbnail(url=product_image_url)
 
-                # 添加时间戳和页脚
-                embed.set_footer(
-                    text=f"PopMart Monitor by FK_popmart | {time.strftime('%Y-%m-%d %H:%M:%S')}")
-
                 # 发送通知
-                mention_message = "@here"
+                mention_message = "@here" if stock_available else None
                 await channel.send(content=mention_message, embed=embed)
                 return True
             else:
