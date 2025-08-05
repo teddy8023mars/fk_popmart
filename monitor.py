@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """
-多平台库存监控器
-支持同时监控AliExpress和PopMart官网
+PopMart官网库存监控器
+专注监控PopMart官网商品库存状态
 """
 
 from monitors.official_monitor import OfficialMonitor
-from monitors.aliexpress_monitor import AliExpressMonitor
 import os
 import sys
 import asyncio
@@ -19,8 +18,8 @@ from dotenv import load_dotenv
 sys.path.append(os.path.dirname(__file__))
 
 
-class MultiPlatformMonitor:
-    """多平台库存监控器"""
+class PopMartMonitor:
+    """PopMart官网库存监控器"""
 
     def __init__(self, bot_token, verbose_mode=False):
         self.bot_token = bot_token
@@ -74,33 +73,6 @@ class MultiPlatformMonitor:
             'cloudflare_wait': int(os.getenv('MONITOR_CLOUDFLARE_WAIT', 10)),
         }
 
-    def add_aliexpress_monitor(self):
-        """添加AliExpress监控器"""
-        try:
-            channel_id = int(os.getenv('ALIEXPRESS_CHANNEL_ID'))
-            product_url = os.getenv('ALIEXPRESS_PRODUCT_URL')
-            config = self.get_unified_config()
-
-            monitor = AliExpressMonitor(
-                channel_id=channel_id,
-                product_url=product_url,
-                min_interval=config['min_interval'],
-                max_interval=config['max_interval'],
-                heartbeat_interval=config['heartbeat_interval'],
-                notification_interval=config['notification_interval'],
-                page_load_timeout=config['page_load_timeout'],
-                page_load_wait=config['page_load_wait'],
-                js_render_wait=config['js_render_wait'],
-                cloudflare_wait=config['cloudflare_wait'],
-                verbose_mode=self.verbose_mode
-            )
-
-            self.monitors.append(monitor)
-            print(f"✅ AliExpress监控器已添加 - 频道ID: {channel_id}")
-
-        except Exception as e:
-            print(f"❌ 添加AliExpress监控器失败: {e}")
-
     def add_official_monitor(self):
         """添加PopMart官网监控器"""
         try:
@@ -150,7 +122,7 @@ class MultiPlatformMonitor:
             return
 
         print("=" * 80)
-        print(f"🤖 多平台监控机器人已启动 - 监控 {len(self.monitors)} 个平台")
+        print(f"🤖 PopMart官网监控机器人已启动")
         print("=" * 80)
 
         # 发送启动通知
@@ -200,41 +172,23 @@ class MultiPlatformMonitor:
             # 清理所有驱动
             for monitor in self.monitors:
                 monitor.cleanup_driver()
-            print("👋 多平台监控程序已退出")
+            print("👋 PopMart监控程序已退出")
 
 
 def parse_arguments():
     """解析命令行参数"""
     parser = argparse.ArgumentParser(
-        description='多平台库存监控器 - Discord Bot',
+        description='PopMart官网库存监控器 - Discord Bot',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-支持的平台:
-  --ali        启用AliExpress监控
-  --pop        启用PopMart官网监控
-
 通知策略:
   正常模式: 检测到库存时持续通知，售罄时仅通知一次
   Verbose模式: 每次检查都发送通知，无论是否有库存
 
 示例:
-  python monitor.py --ali                    # 仅监控AliExpress
-  python monitor.py --pop                    # 仅监控PopMart官网
-  python monitor.py --ali --pop              # 同时监控两个平台
-  python monitor.py --ali --pop --verbose    # 同时监控两个平台，详细模式
+  python monitor.py                    # 正常模式监控
+  python monitor.py --verbose          # 详细模式监控
         """)
-
-    parser.add_argument(
-        '--ali', '--aliexpress',
-        action='store_true',
-        help='启用AliExpress库存监控'
-    )
-
-    parser.add_argument(
-        '--pop', '--popmart',
-        action='store_true',
-        help='启用PopMart官网库存监控'
-    )
 
     parser.add_argument(
         '--verbose', '-v',
@@ -253,38 +207,21 @@ def main():
     # 解析命令行参数
     args = parse_arguments()
 
-    # 检查是否至少选择了一个平台
-    if not args.ali and not args.pop:
-        print("❌ 错误: 请至少选择一个平台进行监控")
-        print("使用 --ali 监控AliExpress，使用 --pop 监控PopMart官网")
-        print("使用 python monitor.py --help 查看详细帮助")
-        return
-
     # 检查BOT_TOKEN
     bot_token = os.getenv('BOT_TOKEN')
     if not bot_token:
         print("❌ 错误: 未找到BOT_TOKEN，请检查.env文件")
         return
 
-    # 创建多平台监控器
-    monitor = MultiPlatformMonitor(bot_token, verbose_mode=args.verbose)
+    # 创建PopMart监控器
+    monitor = PopMartMonitor(bot_token, verbose_mode=args.verbose)
 
-    # 根据参数添加监控器
-    if args.ali:
-        monitor.add_aliexpress_monitor()
-
-    if args.pop:
-        monitor.add_official_monitor()
+    # 添加PopMart官网监控器
+    monitor.add_official_monitor()
 
     # 显示启动信息
-    platforms = []
-    if args.ali:
-        platforms.append("AliExpress")
-    if args.pop:
-        platforms.append("PopMart官网")
-
     mode_info = "🔍 Verbose模式 (每次检查都通知)" if args.verbose else "🎯 正常模式 (有库存时持续通知)"
-    print(f"🚀 正在启动多平台监控... 平台: {', '.join(platforms)} | {mode_info}")
+    print(f"🚀 正在启动PopMart官网监控... | {mode_info}")
 
     # 启动监控
     try:
